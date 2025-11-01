@@ -74,20 +74,14 @@ const Index = () => {
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Bell className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Client Reminders</h1>
-                <p className="text-xs text-muted-foreground">Never miss an important date</p>
-              </div>
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <Bell className="h-5 w-5 text-white" />
             </div>
-            <Button onClick={() => { setEditingClient(null); setDialogOpen(true); }}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Client
-            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Client Reminders</h1>
+              <p className="text-xs text-muted-foreground">Never miss an important date</p>
+            </div>
           </div>
         </div>
       </header>
@@ -179,6 +173,15 @@ const Index = () => {
         onSave={handleSaveClient}
         editClient={editingClient}
       />
+      
+      {/* Floating Add Button */}
+      <Button
+        onClick={() => { setEditingClient(null); setDialogOpen(true); }}
+        size="lg"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all z-50 p-0"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
     </div>
   );
 };
