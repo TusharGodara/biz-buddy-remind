@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Client } from '@/types/client';
 import { getClients, addClient, updateClient, deleteClient } from '@/lib/storage';
 import { getUpcomingEvents, getTomorrowEvents } from '@/lib/events';
+import { checkAndNotifyUpcomingEvents, isNotificationEnabled } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,6 +10,7 @@ import { Search, Plus, Bell, Users, Calendar } from 'lucide-react';
 import EventCard from '@/components/EventCard';
 import ClientCard from '@/components/ClientCard';
 import AddClientDialog from '@/components/AddClientDialog';
+import NotificationPermissionBanner from '@/components/NotificationPermissionBanner';
 import { toast } from 'sonner';
 
 const Index = () => {
@@ -22,16 +24,22 @@ const Index = () => {
   }, []);
   
   useEffect(() => {
-    // Check for tomorrow's events on mount
+    // Check for upcoming events and send notifications
     const upcomingEvents = getUpcomingEvents(clients);
     const tomorrowEvents = getTomorrowEvents(upcomingEvents);
     
+    // Show in-app toast notifications
     if (tomorrowEvents.length > 0) {
       tomorrowEvents.forEach(event => {
         toast.info(`Reminder: Tomorrow is ${event.clientName}'s ${event.eventName}! 🔔`, {
           duration: 5000,
         });
       });
+    }
+    
+    // Send browser notifications if enabled
+    if (isNotificationEnabled()) {
+      checkAndNotifyUpcomingEvents(upcomingEvents);
     }
   }, [clients]);
   
@@ -173,6 +181,9 @@ const Index = () => {
         onSave={handleSaveClient}
         editClient={editingClient}
       />
+      
+      {/* Notification Permission Banner */}
+      <NotificationPermissionBanner />
       
       {/* Floating Add Button */}
       <Button
