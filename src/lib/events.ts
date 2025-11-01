@@ -5,6 +5,7 @@ const getDaysUntilDate = (targetDate: string): number => {
   today.setHours(0, 0, 0, 0);
   
   const target = new Date(targetDate);
+  target.setHours(0, 0, 0, 0);
   const currentYear = today.getFullYear();
   
   // Set target to current year
@@ -16,7 +17,7 @@ const getDaysUntilDate = (targetDate: string): number => {
   }
   
   const diffTime = target.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
   
   return diffDays;
 };

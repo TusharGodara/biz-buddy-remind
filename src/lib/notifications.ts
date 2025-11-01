@@ -67,9 +67,15 @@ export const checkAndNotifyUpcomingEvents = (events: UpcomingEvent[]): void => {
 };
 
 export const isNotificationEnabled = (): boolean => {
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    return false;
+  }
   return Notification.permission === 'granted';
 };
 
 export const canRequestNotification = (): boolean => {
-  return 'Notification' in window && Notification.permission !== 'denied';
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    return false;
+  }
+  return Notification.permission !== 'denied';
 };
