@@ -11,6 +11,7 @@ import EventCard from '@/components/EventCard';
 import ClientCard from '@/components/ClientCard';
 import AddClientDialog from '@/components/AddClientDialog';
 import NotificationPermissionBanner from '@/components/NotificationPermissionBanner';
+import NotificationStatusInfo from '@/components/NotificationStatusInfo';
 import { toast } from 'sonner';
 
 const Index = () => {
@@ -24,23 +25,23 @@ const Index = () => {
   }, []);
   
   useEffect(() => {
-    // Check for upcoming events and send notifications
+    // Check for upcoming events and send device notifications
     const upcomingEvents = getUpcomingEvents(clients);
-    const tomorrowEvents = getTomorrowEvents(upcomingEvents);
-    
-    // Show in-app toast notifications
-    if (tomorrowEvents.length > 0) {
-      tomorrowEvents.forEach(event => {
-        toast.info(`Reminder: Tomorrow is ${event.clientName}'s ${event.eventName}! 🔔`, {
-          duration: 5000,
-        });
-      });
-    }
     
     // Send browser notifications if enabled
     if (isNotificationEnabled()) {
       checkAndNotifyUpcomingEvents(upcomingEvents);
     }
+    
+    // Set up periodic checks (every hour) while app is open
+    const interval = setInterval(() => {
+      const events = getUpcomingEvents(getClients());
+      if (isNotificationEnabled()) {
+        checkAndNotifyUpcomingEvents(events);
+      }
+    }, 60 * 60 * 1000); // Check every hour
+    
+    return () => clearInterval(interval);
   }, [clients]);
   
   const loadClients = () => {
@@ -93,6 +94,8 @@ const Index = () => {
           </div>
         </div>
       </header>
+      
+      <NotificationStatusInfo />
       
       <main className="container mx-auto px-4 py-6">
         <Tabs defaultValue="events" className="space-y-6">

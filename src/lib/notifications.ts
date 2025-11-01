@@ -58,11 +58,35 @@ export const showEventNotification = (event: UpcomingEvent): void => {
 };
 
 export const checkAndNotifyUpcomingEvents = (events: UpcomingEvent[]): void => {
+  if (!isNotificationEnabled()) return;
+  
+  // Get the list of already notified events from localStorage
+  const notifiedKey = 'notified-events';
+  const notifiedToday = localStorage.getItem(notifiedKey);
+  const today = new Date().toDateString();
+  
+  let notifiedEvents: string[] = [];
+  if (notifiedToday === today) {
+    const stored = localStorage.getItem('notified-events-list');
+    notifiedEvents = stored ? JSON.parse(stored) : [];
+  } else {
+    // New day, reset notifications
+    localStorage.setItem(notifiedKey, today);
+    localStorage.setItem('notified-events-list', JSON.stringify([]));
+  }
+  
   // Notify for events happening today or tomorrow
   const urgentEvents = events.filter(event => event.daysUntil <= 1);
   
   urgentEvents.forEach(event => {
-    showEventNotification(event);
+    const eventId = `${event.clientId}-${event.eventType}-${event.eventDate}`;
+    
+    // Only notify if we haven't already notified for this event today
+    if (!notifiedEvents.includes(eventId)) {
+      showEventNotification(event);
+      notifiedEvents.push(eventId);
+      localStorage.setItem('notified-events-list', JSON.stringify(notifiedEvents));
+    }
   });
 };
 
